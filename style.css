@@ -4,7 +4,7 @@
 body {
   padding: 0;
   margin: 0;
-  background: url(./resources/gf-bg.png) fixed;
+  background: rgb(42, 43, 53);
 }
 
 .main-header {
@@ -39,7 +39,7 @@ body {
 .cards-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   grid-gap: 15px;
 }
 
