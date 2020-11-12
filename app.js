@@ -1,5 +1,3 @@
-import makeModal from './makeModal.js';
-
 const cardNames = [
   'bear',
   'bill',
@@ -36,10 +34,12 @@ const makeCardpool = () => {
     </div>
   `;
 
-  shuffledCards.forEach((cardName) => {
-    cardsContainer.innerHTML += cardTemplate(cardName);
-  });
+  cardsContainer.innerHTML = shuffledCards.map(cardTemplate).join('');
+
   state.gameState = 'in progress';
+
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((el) => el.addEventListener('click', handler));
 };
 
 
@@ -49,17 +49,16 @@ const updateCardsState = () => {
   const flippedCards = document.querySelectorAll('[data-flip="true"]');
   state.flippedCards.flippedCardsCount = flippedCards.length;
   state.flippedCards.flippedCollection = [...flippedCards];
-  console.log(state);
 };
 
-const checkFlippedCardsCount = () => state.flippedCards.flippedCardsCount == 2;
+const checkFlippedCardsCount = () => state.flippedCards.flippedCardsCount === 2;
 
 const checkIdentity = () => {
   const [first, second] = state.flippedCards.flippedCollection.map(el => el.dataset.cardId);
   return first === second;
-}
+};
 
-const CheckToWin = () => document.querySelectorAll('.hidden').length === 12;
+const CheckWinCondition = () => document.querySelectorAll('.hidden').length === 12;
 
 const flipCard = (card) => {
     card.classList.add('flip');
@@ -74,7 +73,7 @@ const hideCards = () => {
     card.removeEventListener('click', handler);
   });
   updateCardsState();
-}
+};
 
 const unFlip = async () => {
   await sleep(500);
@@ -87,8 +86,10 @@ const unFlip = async () => {
 
 const endGame = async () => {
   await sleep(500);
-  makeModal();
-}
+  alert('You win');
+  state.gameState = null;
+  render(state);
+};
 
 const render = (state) => {
   if(!state.gameState) makeCardpool();
@@ -111,18 +112,11 @@ const handler = ({ target }) => {
     }
   }
 
-  if (CheckToWin()) state.gameState = 'end';
+  if (CheckWinCondition()) state.gameState = 'end';
 
   render(state);
 };
-
 
 export default () => {
   render(state);
-  
-  const cards = document.querySelectorAll('.card');
-  cards.forEach((el) => el.addEventListener('click', handler));
 };
-
-
-

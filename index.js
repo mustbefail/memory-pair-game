@@ -1,3 +1,2 @@
 import app from './app.js';
-
-app();
+document.addEventListener('DOMContentLoaded', app);
