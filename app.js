@@ -37,13 +37,12 @@ const makeCardpool = () => {
   cardsContainer.innerHTML = shuffledCards.map(cardTemplate).join('');
 
   state.gameState = 'in progress';
-
+  
   const cards = document.querySelectorAll('.card');
   cards.forEach((el) => el.addEventListener('click', handler));
 };
 
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+// const sleep = (ms, fn) => setTimeout(fn, ms);
 
 const updateCardsState = () => {
   const flippedCards = document.querySelectorAll('[data-flip="true"]');
@@ -61,9 +60,9 @@ const checkIdentity = () => {
 const CheckWinCondition = () => document.querySelectorAll('.hidden').length === 12;
 
 const flipCard = (card) => {
-    card.classList.add('flip');
-    card.dataset.flip = 'true';
-    updateCardsState();
+  card.classList.add('flip');
+  card.dataset.flip = 'true';
+  updateCardsState();
 };
 
 const hideCards = () => {
@@ -75,8 +74,7 @@ const hideCards = () => {
   updateCardsState();
 };
 
-const unFlip = async () => {
-  await sleep(500);
+const unFlip = () => {
   state.flippedCards.flippedCollection.forEach((el) => {
     el.classList.remove('flip');
     el.dataset.flip = 'false';
@@ -84,39 +82,39 @@ const unFlip = async () => {
   updateCardsState();
 };
 
-const endGame = async () => {
-  await sleep(500);
+const endGame = () => {
   alert('You win');
   state.gameState = null;
-  render(state);
+  render();
 };
 
-const render = (state) => {
+const render = () => {
   if(!state.gameState) makeCardpool();
-  if(state.gameState === 'end') endGame();
+  if(state.gameState === 'end') setTimeout(endGame, 500);
 };
 
 const handler = ({ target }) => {
   const card = target.closest('.card');
-
+  
   if (!checkFlippedCardsCount()) {
     flipCard(card);
   }
-
+  
   if (checkFlippedCardsCount()) {
     if (checkIdentity()) {
       hideCards();
     }
     else {
-      unFlip();
+      setTimeout(unFlip, 500);
     }
   }
-
+  
   if (CheckWinCondition()) state.gameState = 'end';
-
-  render(state);
+  
+  render();
 };
 
+
 export default () => {
-  render(state);
+  render();
 };
