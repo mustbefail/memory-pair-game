@@ -59,7 +59,6 @@ const hasWinCondition = () => {
 const flipCard = (card) => {
   card.classList.add('flip');
   card.dataset.flip = 'true';
-  updateCardsState();
 };
 
 const hideCards = () => {
@@ -69,22 +68,23 @@ const hideCards = () => {
   });
 };
 
-const unFlip = () => {
+const unFlip = async () => {
+  await sleep(500);
   state.flippedCards.flippedCollection.forEach((el) => {
     el.classList.remove('flip');
     el.dataset.flip = 'false';
   });
 };
 
-const endGame = () => {
+const endGame = async () => {
+  await sleep(500);
   alert('You win');
   state.gameState = null;
-  render();
+  render(state);
 };
 
 const render = (state) => {
   if (!state.gameState) makeCardpool();
-
 };
 
 const handler = ({ target }) => {
