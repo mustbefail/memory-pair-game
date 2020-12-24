@@ -1,11 +1,7 @@
-const cardNames = [
-  'bear',
-  'bill',
-  'blaster',
-  'diary',
-  'dragon',
-  'fighter',
-];
+const CARD_NAMES = ['bear', 'bill', 'blaster', 'diary', 'dragon', 'fighter'];
+
+const WIN_CON_CARDS_NUM = 12;
+const NUM_OF_CARDS_TO_CHECK = 2;
 
 const state = {
   flippedCards: {
@@ -13,51 +9,52 @@ const state = {
     flippedCollection: null,
   },
   hiddenCardsCount: null,
-  gameState: null
+  gameState: null,
+};
+
+const cardsContainer = document.querySelector('.cards-container');
+
+const cardTemplate = (cardName) => `
+<div class="card" data-card-id="${cardName}" data-flip="false">
+<div class="card-back">
+  <img src="./resources/gf-pics/${cardName}.png" alt="flag" class="card-img" />
+</div>
+<div class="card-front">
+</div>
+</div>
+`;
+
+const shuffleCards = (cardNames) => {
+  return [...cardNames, ...cardNames].sort(() => 0.5 - Math.random());
 };
 
 const makeCardpool = () => {
-  const shuffleCards = (cardNames) => {
-    return [...cardNames, ...cardNames]
-      .sort(() => (0.5 - Math.random()));
-  };
-  const shuffledCards = shuffleCards(cardNames);
-  const cardsContainer = document.querySelector('.cards-container');
-
-  const cardTemplate = (cardName) => `
-    <div class="card" data-card-id="${cardName}" data-flip="false">
-    <div class="card-back">
-      <img src="./resources/gf-pics/${cardName}.png" alt="flag" class="card-img" />
-    </div>
-    <div class="card-front">
-    </div>
-    </div>
-  `;
+  const shuffledCards = shuffleCards(CARD_NAMES);
 
   cardsContainer.innerHTML = shuffledCards.map(cardTemplate).join('');
 
   state.gameState = 'in progress';
-  
-  const cards = document.querySelectorAll('.card');
-  cards.forEach((el) => el.addEventListener('click', handler));
 };
 
-// const sleep = (ms, fn) => setTimeout(fn, ms);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const updateCardsState = () => {
-  const flippedCards = document.querySelectorAll('[data-flip="true"]');
-  state.flippedCards.flippedCardsCount = flippedCards.length;
-  state.flippedCards.flippedCollection = [...flippedCards];
-};
+const isCardBlocked = (card) => card.dataset.flip !== 'blocked';
 
-const checkFlippedCardsCount = () => state.flippedCards.flippedCardsCount === 2;
+const isFlippedCardsCount = () =>
+  state.flippedCards.flippedCardsCount === NUM_OF_CARDS_TO_CHECK;
 
-const checkIdentity = () => {
-  const [first, second] = state.flippedCards.flippedCollection.map(el => el.dataset.cardId);
+const hasIdentity = () => {
+  const [first, second] = state.flippedCards.flippedCollection.map(
+    (el) => el.dataset.cardId
+  );
   return first === second;
 };
 
-const CheckWinCondition = () => document.querySelectorAll('.hidden').length === 12;
+const hasWinCondition = () => {
+  if (document.querySelectorAll('.hidden').length === WIN_CON_CARDS_NUM) {
+    endGame();
+  }
+};
 
 const flipCard = (card) => {
   card.classList.add('flip');
@@ -66,12 +63,10 @@ const flipCard = (card) => {
 };
 
 const hideCards = () => {
-  state.flippedCards.flippedCollection.forEach(card => {
-    card.dataset.flip = 'false';
-    card.classList.add('hidden');
-    card.removeEventListener('click', handler);
+  state.flippedCards.flippedCollection.forEach((card) => {
+    card.dataset.flip = 'blocked';
+    card.querySelector('.card-back').classList.add('hidden');
   });
-  updateCardsState();
 };
 
 const unFlip = () => {
@@ -79,7 +74,6 @@ const unFlip = () => {
     el.classList.remove('flip');
     el.dataset.flip = 'false';
   });
-  updateCardsState();
 };
 
 const endGame = () => {
@@ -88,32 +82,29 @@ const endGame = () => {
   render();
 };
 
-const render = () => {
-  if(!state.gameState) makeCardpool();
-  if(state.gameState === 'end') setTimeout(endGame, 500);
+const render = (state) => {
+  if (!state.gameState) makeCardpool();
+
 };
 
 const handler = ({ target }) => {
   const card = target.closest('.card');
-  
-  if (!checkFlippedCardsCount()) {
+
+  if (isCardBlocked(card)) {
     flipCard(card);
+    const flippedCards = document.querySelectorAll('[data-flip="true"]');
+    state.flippedCards.flippedCardsCount = flippedCards.length;
+    state.flippedCards.flippedCollection = [...flippedCards];
   }
-  
-  if (checkFlippedCardsCount()) {
-    if (checkIdentity()) {
-      hideCards();
-    }
-    else {
-      setTimeout(unFlip, 500);
-    }
+
+  if (isFlippedCardsCount()) {
+    if (hasIdentity()) hideCards();
+    else unFlip();
   }
-  
-  if (CheckWinCondition()) state.gameState = 'end';
-  
-  render();
+  hasWinCondition();
 };
 
+cardsContainer.addEventListener('click', handler);
 
 export default () => {
   render();
