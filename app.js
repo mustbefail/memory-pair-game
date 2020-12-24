@@ -50,11 +50,9 @@ const hasIdentity = () => {
   return first === second;
 };
 
-const hasWinCondition = () => {
-  if (document.querySelectorAll('.hidden').length === WIN_CON_CARDS_NUM) {
-    endGame();
-  }
-};
+const hasWinCondition = () =>
+  document.querySelectorAll('.hidden').length === WIN_CON_CARDS_NUM;
+
 
 const flipCard = (card) => {
   card.classList.add('flip');
@@ -74,6 +72,7 @@ const unFlip = async () => {
     el.classList.remove('flip');
     el.dataset.flip = 'false';
   });
+  state.flippedCards.flippedCardsCount = 0;
 };
 
 const endGame = async () => {
@@ -89,6 +88,8 @@ const render = (state) => {
 
 const handler = ({ target }) => {
   const card = target.closest('.card');
+  if(!card) return;
+
 
   if (isCardBlocked(card)) {
     flipCard(card);
@@ -97,11 +98,12 @@ const handler = ({ target }) => {
     state.flippedCards.flippedCollection = [...flippedCards];
   }
 
+
   if (isFlippedCardsCount()) {
     if (hasIdentity()) hideCards();
     else unFlip();
   }
-  hasWinCondition();
+  if (hasWinCondition()) endGame();
 };
 
 cardsContainer.addEventListener('click', handler);
