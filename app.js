@@ -107,5 +107,5 @@ const handler = ({ target }) => {
 cardsContainer.addEventListener('click', handler);
 
 export default () => {
-  render();
+  render(state);
 };
