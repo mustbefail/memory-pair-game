@@ -46,7 +46,7 @@ body {
 .card {
   width: 130px;
   height: 170px;
-  box-shadow: 0 0 10px rgba(29, 24, 24, 0.39);
+  /* box-shadow: 0 0 10px rgba(29, 24, 24, 0.39); */
   background-color: transparent;
   position: relative;
   text-align: center;
@@ -83,5 +83,5 @@ body {
 
 .hidden {
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.7s;
 }
